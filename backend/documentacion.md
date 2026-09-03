@@ -56,3 +56,6 @@ Estado actual:
   7. Si mi configuración actual tiene algún problema.
 
 Importante: la contraseña de PostgreSQL fue compartida anteriormente en el archivo `.env`, así que también necesito saber cómo cambiarla o protegerla correctamente y confirmar que `.env` no se suba a GitHub.
+
+instalacion de bycripty para el hasheo de contrasenia
+npm install bcrypt

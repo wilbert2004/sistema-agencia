@@ -2,6 +2,7 @@
 const express = require("express");
 //importamos cors
 const cors = require("cors");
+const usuariosRoutes = require("./modules/usuarios/usuarios.routes");
 
 //crearemos la app para el exprees
 const app = express();
@@ -9,11 +10,12 @@ const app = express();
 //middlewares
 app.use(cors());
 app.use(express.json());
+app.use("/api/usuarios", usuariosRoutes);
 
 //importamos las rutas
 app.get("/", (req, res) => {
   res.json({
-    message: "Bienvenido a la API de sistema de agencia",
+    mensaje: "API de sistema-agencia funcionando",
   });
 });
 
