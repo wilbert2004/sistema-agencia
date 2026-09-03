@@ -7,14 +7,16 @@
     "typescript": "^7.0.2"
   },
   "scripts": {
-    "start": "node src/server.js",
+    "start": "tsx src/server.js",
     "contract:emit": "prisma contract emit"
   },
   "type": "commonjs",
   "dependencies": {
     "@prisma/orm-postgres": "^8.0.0-rc.8",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "temporal-polyfill": "^1.0.4"
   }
 }
