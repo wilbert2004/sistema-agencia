@@ -1,61 +1,144 @@
-✅ PostgreSQL
-✅ Base creativa_estudio
-✅ 18 tablas
-✅ Prisma 8
-✅ contract.prisma
-✅ contract.json
-✅ contract.d.ts
-✅ db.ts
-✅ DATABASE_URL
-✅ database signed
-✅ conexión probada
+# Documentación General del Backend (`BACKEND.md`)
 
-Estoy desarrollando un sistema para una agencia llamado “sistema-agencia”.
+## Visión General
 
-Hasta ahora hice lo siguiente:
+El backend de **“sistema-agencia”** está construido con Node.js, Express, TypeScript y Prisma ORM, conectado a una base de datos PostgreSQL llamada `creativa_estudio`. Maneja una arquitectura por módulos desacoplados con patrón **Routes - Validation - Controller - Service**.
 
-1. Tengo una base de datos PostgreSQL llamada `creativa_estudio`, creada y cargada desde pgAdmin 4.
-2. La base de datos está en localhost, puerto 5432.
-3. Estoy usando Prisma Next con PostgreSQL.
-4. La configuración principal está dentro de la carpeta `backend`.
-5. El archivo correcto del modelo de datos es:
-   `backend/src/prisma/contract.prisma`
-6. Ese archivo contiene los modelos de mi base de datos, como:
-   Roles, Usuarios, Clientes, Propuestas, Proyectos, Trabajadores, Asignaciones, Actividades, Entregables, Documentos, Especialidades, Etapas, Pagos y Servicios.
-7. También existen estos archivos generados:
-   `backend/src/prisma/contract.json`
-   `backend/src/prisma/contract.d.ts`
-8. La conexión está en:
-   `backend/src/prisma/db.ts`
-9. La configuración de Prisma está en:
-   `backend/prisma.config.ts`
-10. El archivo `backend/.env` contiene la conexión:
-    `DATABASE_URL="postgresql://postgres:MI_CONTRASEÑA@localhost:5432/creativa_estudio"`
-11. Ejecuté correctamente desde la carpeta `backend`:
-    `npm run contract:emit`
-12. El comando terminó correctamente y generó `contract.json` y `contract.d.ts`.
-13. También se revisó TypeScript y no se encontraron errores.
-14. Eliminé archivos duplicados y ejemplos que estaban confundiendo:
-    contratos Prisma de la raíz, otra configuración Prisma y archivos de ejemplo.
-15. A partir de ahora, los comandos de Prisma deben ejecutarse desde:
-    `C:\Users\chanw\OneDrive\Desktop\sistema-agencia\backend`
+---
 
-Estado actual:
+## 1. Configuración de Base de Datos y Prisma
 
-- PostgreSQL ya está cargado.
-- El contrato Prisma ya fue generado.
-- La conexión está configurada.
-- Todavía necesito saber cuál es el siguiente paso para comenzar a usar la base de datos desde el backend y conectar el frontend.
-- Necesito que revises la estructura actual del proyecto y me indiques, paso a paso y de forma sencilla:
-  1. Cómo probar que la conexión a PostgreSQL funciona.
-  2. Cómo hacer una consulta de prueba usando `db` desde TypeScript.
-  3. Cómo crear la estructura básica del backend.
-  4. Cómo conectar el frontend con el backend.
-  5. Qué archivos faltan crear.
-  6. Qué comandos debo ejecutar y desde qué carpeta.
-  7. Si mi configuración actual tiene algún problema.
+- **Base de datos:** PostgreSQL (`creativa_estudio` en `localhost:5432`).
+- **Ubicación del esquema:** `backend/src/prisma/contract.prisma`.
+- **Conexión Prisma:** Configurada en `backend/src/prisma/db.ts` utilizando la variable de entorno `DATABASE_URL`.
+- **Generación del contrato:** Ejecutada desde la carpeta `backend/`:
 
-Importante: la contraseña de PostgreSQL fue compartida anteriormente en el archivo `.env`, así que también necesito saber cómo cambiarla o protegerla correctamente y confirmar que `.env` no se suba a GitHub.
+```bash
+npm run contract:emit
 
-instalacion de bycripty para el hasheo de contrasenia
+```
+
+Genera los artefactos de tipos `contract.json` y `contract.d.ts`.
+
+---
+
+## 2. Seguridad y Variables de Entorno (`.env`)
+
+El archivo `backend/.env` maneja datos sensibles de conexión:
+DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
+
+```env
+
+
+```
+
+### Reglas de Seguridad Obligatorias:
+
+1. **Protección en Git:** Asegúrate de que `backend/.gitignore` contenga la línea `.env` para evitar que las credenciales se suban al repositorio público/privado de GitHub.
+2. **Encriptación de Contraseñas:** Se utiliza **`bcrypt`** para el hasheo de contraseñas de los usuarios antes de persistir en la columna `contrasenaHash`:
+
+```bash
 npm install bcrypt
+npm install --save-dev @types/bcrypt
+
+```
+
+---
+
+## 3. Estado de Módulos Desarrollados
+
+Actualmente el sistema cuenta con los módulos base de administración e identidad terminados:
+
+| Módulo           | Ruta Base           | Estado                                   | Documentación     |
+| ---------------- | ------------------- | ---------------------------------------- | ----------------- |
+| **Roles**        | `/api/roles`        | ✅ 100% Completo (CRUD)                  | `ROLES.md`        |
+| **Usuarios**     | `/api/usuarios`     | ✅ 100% Completo (CRUD + Borrado Lógico) | `USUARIOS.md`     |
+| **Clientes**     | `/api/clientes`     | ✅ 100% Completo (CRUD + Borrado Lógico) | `CLIENTES.md`     |
+| **Trabajadores** | `/api/trabajadores` | ⏳ GET, GET /:id y POST terminados       | `TRABAJADORES.md` |
+
+---
+
+## 4. Estructura de Carpetas del Proyecto
+
+```text
+backend/
+├── src/
+│   ├── config/
+│   │   └── database.js (o db.ts)
+│   ├── modules/
+│   │   ├── roles/
+│   │   ├── usuarios/
+│   │   ├── clientes/
+│   │   └── trabajadores/
+│   ├── prisma/
+│   │   ├── contract.prisma
+│   │   ├── contract.json
+│   │   ├── contract.d.ts
+│   │   └── db.ts
+│   └── app.js (o index.ts)
+├── .env
+├── .gitignore
+├── prisma.config.ts
+└── package.json
+
+```
+
+---
+
+## 5. Respuestas a la Guía de Integración
+
+### 1 & 2. Prueba de Conexión y Consulta con Prisma
+
+Puedes verificar la base de datos creando un script rápido `backend/src/test-db.ts`:
+
+```typescript
+import { db } from "./prisma/db";
+
+async function main() {
+  try {
+    const totalUsuarios = await db.orm.public.Usuarios.count();
+    console.log(" Conexión exitosa. Total de usuarios en BD:", totalUsuarios);
+  } catch (error) {
+    console.error(" Error de conexión a PostgreSQL:", error);
+  }
+}
+
+main();
+```
+
+### 3. Conexión del Backend con el Frontend
+
+Para permitir que la aplicación cliente (React, Next.js, etc.) se comunique sin bloqueos de seguridad del navegador, habilita **CORS** en `app.js`:
+
+```bash
+npm install cors
+
+```
+
+```javascript
+const express = require("express");
+const cors = require("cors");
+const app = express();
+
+app.use(cors()); // Permite peticiones desde el frontend
+app.use(express.json());
+```
+
+### 4. Siguientes Módulos a Construir
+
+Para completar las 18 tablas según el archivo `contract.prisma`, la hoja de ruta sugerida es:
+
+1. Finalizar `PUT` y `DELETE` de **Trabajadores**.
+2. **Módulo de Autenticación (`POST /api/auth/login`)**: Comparar contraseñas hasheadas con `bcrypt` y generar un Token JWT.
+3. **Módulo de Proyectos y Propuestas**: Vincular clientes con sus respectivos proyectos.
+4. **Módulo de Tareas, Actividades y Entregables**: Núcleo operativo del seguimiento de entregas.
+
+---
+
+## 6. Comandos Principales
+
+Todos los comandos deben ejecutarse desde la carpeta `backend/`:
+
+- **Compilar/Generar contrato Prisma:** `npm run contract:emit`
+- **Iniciar en desarrollo:** `npm start`
+- **Verificar tipos TypeScript:** `npx tsc --noEmit`

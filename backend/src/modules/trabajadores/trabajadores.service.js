@@ -48,6 +48,7 @@ async function crearTrabajador(datos) {
     puesto: datos.puesto.trim(),
   });
 }
+
 //exportar
 module.exports = {
   obtenerTrabajadores,
