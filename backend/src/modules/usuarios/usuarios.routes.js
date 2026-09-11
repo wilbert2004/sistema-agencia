@@ -9,5 +9,9 @@ router.get("/", usuariosController.obtenerUsuarios);
 router.get("/:id", usuariosController.obtenerUsuarioPorId);
 //esta ruta sirve para crear un usuario en la base de datos
 router.post("/", usuariosController.crearUsuario);
+//esta ruta sirve para actualizar un usuario en la base de datos
+router.put("/:id", usuariosController.actualizarUsuario);
+//esta ruta sirve para eliminar un usuario en la base de datos
+router.delete("/:id", usuariosController.eliminarUsuario);
 
 module.exports = router;

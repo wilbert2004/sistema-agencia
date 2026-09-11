@@ -59,9 +59,132 @@ async function crearUsuario(datos) {
   return nuevoUsuario;
 }
 
+//crearemos una funcion para actualizar un usuario en la base de datos
+async function actualizarUsuario(id, datos) {
+  //verificamos que el usuario exista en la base de datos
+  const usuarioExistente = await db.orm.public.Usuarios.select("idUsuario")
+    .where({ idUsuario: id })
+    .first();
+
+  //agregaremos la condicion que si no existe el usuario un errro
+  if (!usuarioExistente) {
+    const error = new Error("El usuario no encontrado");
+    error.statusCode = 404; // Not Found
+    throw error;
+  }
+
+  //declaremso una variable del data
+  const data = {};
+
+  //vamos a validar limpiar nombre
+  if (datos.nombre !== undefined) {
+    data.nombre = datos.nombre.trim();
+  }
+
+  //validar correo no duplicado
+  if (datos.correo !== undefined) {
+    const correo = datos.correo.trim().toLowerCase();
+    // first() ejecuta la consulta y devuelve un usuario o null.
+    const correoExistente = await db.orm.public.Usuarios.select(
+      "idUsuario",
+      "correo",
+    )
+      .where({ correo })
+      .first();
+
+    if (correoExistente && correoExistente.idUsuario !== id) {
+      const error = new Error("El correo ya está registrado");
+      error.statusCode = 409;
+      throw error;
+    }
+    data.correo = correo;
+  }
+
+  //validar que el rol exista en la base de datos
+  if (datos.idRol !== undefined) {
+    const idRolNumero = Number(datos.idRol);
+
+    // Se consulta el rol antes de actualizar para evitar guardar un idRol inexistente.
+    const rolEncontrado = await db.orm.public.Roles.select("idRol")
+      .where({ idRol: idRolNumero })
+      .first();
+
+    if (!rolEncontrado) {
+      const error = new Error("El rol especificado no existe");
+      error.statusCode = 400; // Bad Request
+      throw error;
+    }
+    data.idRol = idRolNumero;
+  }
+
+  //estado activo/inactivo
+  if (datos.activo !== undefined) {
+    data.activo = Boolean(datos.activo);
+  }
+
+  //actualizamos el registro del usuario en la base de datos
+  await db.orm.public.Usuarios.where({ idUsuario: id }).update(data);
+  // Volvemos a consultar el usuario y omitimos la contraseña en la respuesta.
+  return db.orm.public.Usuarios.select(
+    "idUsuario",
+    "idRol",
+    "nombre",
+    "correo",
+    "activo",
+    "fechaRegistro",
+  )
+    .where({ idUsuario: id })
+    .first();
+}
+
+//validar la eliminacion de un usuario en la base de datos
+async function eliminarUsuario(id) {
+  //buscaremos el usuaerio por id
+  const usuarioExistente = await db.orm.public.Usuarios.select(
+    "idUsuario",
+    "activo",
+  )
+    //entonces si no existe el usuario lanzaremos un error
+    .where({ idUsuario: id })
+    .first();
+
+  //en dado caso que no exista lanzar un error 404
+  if (!usuarioExistente) {
+    const error = new Error("El usuario no encontrado");
+    error.statusCode = 404; // Not Found
+    throw error;
+  }
+
+  //si el usuario esta desactiuvado que mande un error 400
+  if (!usuarioExistente.activo) {
+    const error = new Error("El usuario ya esta desactivado");
+    error.statusCode = 400; // Bad Request
+    throw error;
+  }
+
+  //reralizaremos el borrado logico (actualizar activo a false )
+  await db.orm.public.Usuarios.where({
+    idUsuario: id,
+  }).update({ activo: false });
+
+  //retornaremos el usuario actualizaddo con sus datos limpios
+  const usuarioActualizado = await db.orm.public.Usuarios.select(
+    "idUsuario",
+    "idRol",
+    "nombre",
+    "correo",
+    "activo",
+    "fechaRegistro",
+  ).where({ idUsuario: id });
+
+  //retornamos el usuario actualizado
+  return usuarioActualizado[0];
+}
 //exportamos las funciones para que puedan ser utilizadas en otros archivos
 module.exports = {
   obtenerUsuarios,
   obtenerUsuarioPorId,
   crearUsuario,
+  actualizarUsuario,
+  eliminarUsuario,
 };

@@ -1,6 +1,9 @@
 const usuariosService = require("./usuarios.service");
 //importamos el servicio de usuarios para poder utilizarlo en el controlador
-const { validarCrearUsuario } = require("./usuarios.validation");
+const {
+  validarCrearUsuario,
+  validarActualizarUsuario,
+} = require("./usuarios.validation");
 
 //esta funcion nos sirve para obtener todos los usuarios de la base de datos
 async function obtenerUsuarios(req, res) {
@@ -77,8 +80,73 @@ async function crearUsuario(req, res) {
   }
 }
 
+//crearemos una funcion para actualizar un usuario en la base de datos
+async function actualizarUsuario(req, res) {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "El ID del usuario debe ser un número entero positivo",
+      });
+    }
+    const errores = validarActualizarUsuario(req.body);
+
+    if (errores.length > 0) {
+      return res.status(400).json({
+        success: false,
+        errores,
+      });
+    }
+
+    const usuario = await usuariosService.actualizarUsuario(id, req.body);
+    res.json({
+      success: true,
+      message: "Usuario actualizado exitosamente",
+      data: usuario,
+    });
+  } catch (error) {
+    console.error("Error al actualizar usuario:", error);
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || "Error interno del servidor",
+    });
+  }
+}
+
+//crearemos una funcion para eliminar un usuario en la base de datos
+async function eliminarUsuario(req, res) {
+  try {
+    const id = Number(req.params.id);
+
+    //agregaremos una condicion que si el id no es un numero entero positivo un error
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "El ID del usuario debe ser un número entero positivo",
+      });
+    }
+
+    //llamaremos a la funcion eliminarUsuario del servicio de usuarios
+    const usuario = await usuariosService.eliminarUsuario(id);
+    res.json({
+      success: true,
+      message: "Usuario eliminado exitosamente",
+      data: usuario,
+    });
+  } catch (error) {
+    console.error("Error al eliminar usuario:", error);
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || "Error interno del servidor",
+    });
+  }
+}
+
 module.exports = {
   obtenerUsuarios,
   obtenerUsuarioPorId,
   crearUsuario,
+  actualizarUsuario,
+  eliminarUsuario,
 };
