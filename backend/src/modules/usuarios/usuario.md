@@ -1,26 +1,160 @@
-El módulo de usuario tiene **5 endpoints de API REST**: listar (mostrar todos), obtener por ID (buscar), crear, editar y cambiar estado (borrado lógico).
+# Módulo de Usuarios (`USUARIOS.md`)
 
-«El módulo de usuario cuenta con 5 APIs REST: **listar todos, buscar por ID, crear, editar y eliminar**. La funcionalidad de "eliminar" operará mediante un **borrado lógico** (utilizando un atributo _activo / inactivo_), ya que eliminar los registros directamente de la base de datos es innecesario y provocaría la pérdida irrecuperable de información.»
+## Visión General
 
-### Mapeo técnico de las 5 APIs REST
+El módulo de usuarios gestiona la autenticación, roles y estado de acceso de todos los integrantes del sistema (Administradores, Trabajadores y Clientes).
 
-| **Listar** | `GET` | `/api/usuarios` | Muestra el listado de usuarios (generalmente filtrados por `activo = true`). |
-| **Buscar** | `GET` | `/api/usuarios/{id}` | Obtiene la información detallada de un usuario por su ID. |
-| **Crear** | `POST` | `/api/usuarios` | Registra un nuevo usuario en la base de datos (con `activo = true` por defecto). |
-| **Editar** | `PUT` / `PATCH` | `/api/usuarios/{id}` | Actualiza los datos del usuario. |
-| **"Eliminar"** | `PATCH` / `DELETE` | `/api/usuarios/{id}/estado` | **Borrado Lógico:** Cambia el atributo `activo` a `false`. |
+La funcionalidad de eliminación ópera mediante un **borrado lógico** (`activo: false`). No se realizan borrados físicos directamente en la base de datos para evitar la pérdida irrecuperable de información y mantener la integridad referencial con los demás módulos (como Clientes o Tareas).
 
-los apirest creados para el rol de usuarios:
-Método Endpoint Función
-GET /api/usuarios Obtener todos
-GET /api/usuarios/:id Obtener uno
-POST /api/usuarios Crear
-PUT /api/usuarios/:id Actualizar
-DELETE /api/usuarios/:id Eliminar
+---
 
-Manejo correcto de errores:
-200 → correcto
-201 → creado
-400 → datos incorrectos
-404 → no encontrado
-500 → error interno
+## Esquema de Base de Datos
+
+- **`Usuarios`**:
+- `id_usuario` (Integer, PK): Identificador único del usuario.
+- `id_rol` (Integer, FK): Rol asignado (`1 = Admin`, `2 = Trabajador`, `3 = Cliente`).
+- `nombre` (Varying Character): Nombre completo del usuario.
+- `correo` (Varying Character): Correo electrónico (único).
+- `contrasena_hash` (Varying Character): Contraseña encriptada.
+- `activo` (Boolean): Estado de la cuenta (`true` por defecto).
+- `fecha_registro` (Timestamp): Fecha de creación del registro.
+
+---
+
+## Reglas de Negocio
+
+- **Borrado Lógico (`DELETE /api/usuarios/:id`):** Al eliminar un usuario, no se destruye el registro en la base de datos (`.del()`), sino que se actualiza el campo `activo` a `false`.
+- **Creación de Usuarios (`POST`):** Se crea el usuario con `activo: true` por defecto. Si el `idRol` enviado corresponde a un Cliente (`idRol = 3`), posteriormente se debe registrar su información comercial en la API `/api/clientes`.
+- **Manejo de Códigos HTTP:**
+- **`200 OK`**: Solicitud procesada correctamente.
+- **`201 Created`**: Usuario creado exitosamente.
+- **`400 Bad Request`**: Datos de entrada incorrectos o faltantes.
+- **`404 Not Found`**: El usuario solicitado no existe.
+- **`500 Internal Server Error`**: Error interno del servidor o de la base de datos.
+
+---
+
+## Endpoints de la API
+
+| Método   | Endpoint            | Descripción                                                                     |
+| -------- | ------------------- | ------------------------------------------------------------------------------- |
+| `GET`    | `/api/usuarios`     | Obtiene el listado de usuarios (filtrando preferentemente por `activo = true`). |
+| `GET`    | `/api/usuarios/:id` | Obtiene la información detallada de un usuario por su ID.                       |
+| `POST`   | `/api/usuarios`     | Registra un nuevo usuario en la base de datos (`activo = true`).                |
+| `PUT`    | `/api/usuarios/:id` | Actualiza los datos de un usuario (`nombre`, `correo`, `idRol`, etc.).          |
+| `DELETE` | `/api/usuarios/:id` | Ejecuta la baja lógica cambiando el atributo `activo` a `false`.                |
+
+---
+
+## Ejemplos de Petición / Respuesta
+
+### `GET /api/usuarios`
+
+**Respuesta Exitosa (`200 OK`):**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "idUsuario": 1,
+      "idRol": 1,
+      "nombre": "Administrador General",
+      "correo": "admin@creativaestudio.com",
+      "activo": true,
+      "fechaRegistro": "2026-09-03T16:30:26.911Z"
+    },
+    {
+      "idUsuario": 2,
+      "idRol": 3,
+      "nombre": "Juan Pérez",
+      "correo": "juan.perez@tecnoplaza.com",
+      "activo": true,
+      "fechaRegistro": "2026-09-07T15:20:01.642Z"
+    }
+  ]
+}
+```
+
+---
+
+### `POST /api/usuarios`
+
+**Cuerpo de la Petición:**
+
+```json
+{
+  "idRol": 3,
+  "nombre": "Juan Pérez",
+  "correo": "juan.perez@tecnoplaza.com",
+  "contrasena": "password123"
+}
+```
+
+**Respuesta Exitosa (`201 Created`):**
+
+```json
+{
+  "success": true,
+  "mensaje": "Usuario creado correctamente",
+  "data": {
+    "idUsuario": 2,
+    "idRol": 3,
+    "nombre": "Juan Pérez",
+    "correo": "juan.perez@tecnoplaza.com",
+    "activo": true,
+    "fechaRegistro": "2026-09-07T15:20:01.642Z"
+  }
+}
+```
+
+---
+
+### `PUT /api/usuarios/:id`
+
+**Cuerpo de la Petición:**
+
+```json
+{
+  "nombre": "Juan Pérez Modificado",
+  "idRol": 2
+}
+```
+
+**Respuesta Exitosa (`200 OK`):**
+
+```json
+{
+  "success": true,
+  "mensaje": "Usuario actualizado correctamente",
+  "data": {
+    "idUsuario": 2,
+    "idRol": 2,
+    "nombre": "Juan Pérez Modificado",
+    "correo": "juan.perez@tecnoplaza.com",
+    "activo": true
+  }
+}
+```
+
+---
+
+### `DELETE /api/usuarios/:id`
+
+**Respuesta Exitosa (`200 OK`):**
+
+```json
+{
+  "success": true,
+  "mensaje": "Usuario desactivado correctamente"
+}
+```
+
+**Respuesta de Error (`404 Not Found`):**
+
+```json
+{
+  "success": false,
+  "mensaje": "Usuario no encontrado"
+}
+```

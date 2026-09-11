@@ -136,7 +136,7 @@ async function eliminarCliente(req, res) {
       data: cliente,
     });
   } catch (error) {
-    console.error("Error al eliminar cliente:", error);
+    console.error("Error al desactivar cliente:", error);
     res.status(500).json({
       success: false,
       message: "Error interno del servidor",
