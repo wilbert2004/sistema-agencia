@@ -87,9 +87,81 @@ async function crearTrabajador(req, res) {
     });
   }
 }
+
+//funcion para actualizar un trabajador
+async function actualizarTrabajador(req, res) {
+  try {
+    //obtenemos el id del trabajador
+    const id = parseInt(req.params.id);
+
+    //verificamos si el trabajador existe
+    const trabajadorExistente =
+      await trabajadoresService.obtenerTrabajadorPorId(id);
+
+    //verificamos que el trabajador si exista
+    if (!trabajadorExistente) {
+      //lanzamos un error 400
+      return res.status(400).json({
+        success: false,
+        message: "El trabajador no existe",
+      });
+    }
+    //en dado caso que exista el trabajador, actualizamos el puesto del trabajador
+    const trabajador = await trabajadoresService.actualizarTrabajador(id, {
+      puesto: req.body.puesto,
+    });
+
+    //lamzamos un internal 200 como exito y devolvemos el trabajador actualizado
+    return res.status(200).json({
+      success: true,
+      data: trabajador,
+      message: "Trabajador actualizado exitosamente",
+    });
+  } catch (error) {
+    console.error("Error al actualizar trabajador:", error);
+    //lanzamos un error 500 del servidor
+    return res.status(500).json({
+      success: false,
+      message: "Error interno del servidor",
+    });
+  }
+}
+
+//funcion para eliminar un trabajador
+async function eliminarTrabajador(req, res) {
+  try {
+    //obtenemos el id del trabajador
+    const id = Number(req.params.id);
+    ///verificamos si el trabajador existe
+    const trabajadorExistente =
+      await trabajadoresService.eliminarTrabajador(id);
+    //lanzamos internal 200 con exito y devolvemos el trabajador eliminado
+    return res.status(200).json({
+      success: true,
+      message: "Trabajador desactivado exitosamente",
+      data: trabajadorExistente.data,
+    });
+  } catch (error) {
+    console.error("Error al eliminar trabajador:", error);
+
+    if (error.message === "Trabajador no encontrado") {
+      return res.status(404).json({
+        success: false,
+        message: "El trabajador no existe",
+      });
+    }
+    //lanzamos un error 500 del servidor
+    return res.status(500).json({
+      success: false,
+      message: "Error interno del servidor",
+    });
+  }
+}
 //expotar
 module.exports = {
   obtenerTrabajadores,
   obtenerTrabajadorPorId,
   crearTrabajador,
+  actualizarTrabajador,
+  eliminarTrabajador,
 };

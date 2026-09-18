@@ -40,10 +40,41 @@ function validarCrearTrabajador(req, res, next) {
   }
   next();
 }
+//funcion para el put de validacion de los datos del trabajador
+function validarActualizarTrabajador(req, res, next) {
+  const { puesto } = req.body;
+  // Validar que puesto sea una cadena de texto y no esté vacío
+  if (puesto === undefined) {
+    //retornamos un error 400
+    return res.status(400).json({
+      success: false,
+      message: "El puesto es obligatorio",
+    });
+  }
+  //validamos que sea un string  y que no este vacio
+  if (typeof puesto !== "string" || puesto.trim().length === 0) {
+    //retirnamos un error 400
+    return res.status(400).json({
+      success: false,
+      message: "El puesto debe ser una cadena de texto y no puede estar vacío",
+    });
+  }
+
+  //validamos que el puesto de los caracteres no supere los 100 caracteres
+  if (puesto.trim().length > 100) {
+    return res.status(400).json({
+      success: false,
+      message: "El puesto no puede superar los 100 caracteres",
+    });
+  }
+
+  next();
+}
 
 //exportamos la funcion para validar la obtencion de un cliente
 module.exports = {
   ValidarObtenerTrabajadores,
   ValidarObtenerTrabajadorPorId,
   validarCrearTrabajador,
+  validarActualizarTrabajador,
 };

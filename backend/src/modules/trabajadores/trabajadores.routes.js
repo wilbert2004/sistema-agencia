@@ -8,6 +8,7 @@ const {
   ValidarObtenerTrabajadores,
   ValidarObtenerTrabajadorPorId,
   validarCrearTrabajador,
+  validarActualizarTrabajador,
 } = require("./trabajadores.validation");
 
 //creamos el router de express
@@ -31,6 +32,21 @@ router.post(
   "/",
   validarCrearTrabajador,
   trabajadoresController.crearTrabajador,
+);
+
+//rura para actualizar un trabajador
+router.put(
+  "/:id",
+  ValidarObtenerTrabajadorPorId,
+  validarActualizarTrabajador,
+  trabajadoresController.actualizarTrabajador,
+);
+
+//ruta para eliminar un trabajador
+router.delete(
+  "/:id",
+  ValidarObtenerTrabajadorPorId,
+  trabajadoresController.eliminarTrabajador,
 );
 
 //exportamos el router
