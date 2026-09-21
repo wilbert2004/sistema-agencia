@@ -7,6 +7,8 @@ const {
   obtenerServicios,
   obtenerServicioPorId,
   validarCrearServicio,
+  validarActualizarServicio,
+  validarEliminarServicio,
 } = require("./servicios.validation");
 
 //creamos el router de express
@@ -24,6 +26,20 @@ router.get(
 
 //esta ruta sirve para crear un servicio
 router.post("/", validarCrearServicio, serviciosController.crearServicio);
+
+//esta ruta sirve para actualizar un servicio
+router.put(
+  "/:id",
+  validarActualizarServicio,
+  serviciosController.actualizarServicio,
+);
+
+//esta ruta sirve para eliminar un servicio
+router.delete(
+  "/:id",
+  validarEliminarServicio,
+  serviciosController.eliminarServicio,
+);
 
 //exportamos el router
 module.exports = router;
