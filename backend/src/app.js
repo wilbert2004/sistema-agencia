@@ -17,6 +17,8 @@ const trabajadorEspecialidadRoutes = require("./modules/trabajador-especialidad/
 const serviciosRoutes = require("./modules/servicios/servicios.routes");
 //importamos las rutas de etapas
 const etapasRoutes = require("./modules/etapas/etapas.routes");
+//importamos las rutas de propuestas
+const propuestasRoutes = require("./modules/propuestas/propuestas.routes");
 
 //crearemos la app para el exprees
 const app = express();
@@ -32,6 +34,7 @@ app.use("/api/especialidades", especialidadesRoutes);
 app.use("/api/trabajador-especialidad", trabajadorEspecialidadRoutes);
 app.use("/api/servicios", serviciosRoutes);
 app.use("/api/etapas", etapasRoutes);
+app.use("/api/propuestas", propuestasRoutes);
 //importamos las rutas
 app.get("/", (req, res) => {
   res.json({
