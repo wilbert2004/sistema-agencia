@@ -26,6 +26,9 @@ const propuestaDetalleRoutes = require("./modules/propuesta-detalle/propuesta-de
 //importamos las rutas de proyectos
 const proyectosRoutes = require("./modules/proyectos/proyectos.routes");
 
+//importamos las rutas de proyecto-servicio
+const proyectoServicioRoutes = require("./modules/proyecto-servicio/proyecto-servicio.routes");
+
 //crearemos la app para el exprees
 const app = express();
 
@@ -43,6 +46,7 @@ app.use("/api/etapas", etapasRoutes);
 app.use("/api/propuestas", propuestasRoutes);
 app.use("/api/propuestas-detalles", propuestaDetalleRoutes);
 app.use("/api/proyectos", proyectosRoutes);
+app.use("/api/proyecto-servicio", proyectoServicioRoutes);
 //importamos las rutas
 app.get("/", (req, res) => {
   res.json({
