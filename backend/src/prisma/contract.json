@@ -3062,7 +3062,15 @@
                 ],
                 "name": "pk_propuesta_detalle"
               },
-              "uniques": []
+              "uniques": [
+                {
+                  "columns": [
+                    "id_propuesta",
+                    "id_servicio"
+                  ],
+                  "name": "uq_propuesta_detalle_propuesta_servicio"
+                }
+              ]
             },
             "propuestas": {
               "checks": [
@@ -3878,7 +3886,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "42534c0055c9cdc3279e6b87d4c417d6671d3b50d3787e6e0e757069b92d58a4"
+    "storageHash": "2ba8974536b06b4a469dd18e823fcc5e71128e7e3a0f3004a8e4347b34a967e8"
   },
   "capabilities": {
     "postgres": {

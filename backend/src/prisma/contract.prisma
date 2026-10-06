@@ -234,6 +234,7 @@ model PropuestaDetalle {
   @@check(expression: "(cantidad > 0)", map: "chk_propuesta_detalle_cantidad")
   @@check(expression: "(precio_unitario >= (0)::numeric)", map: "chk_propuesta_detalle_precio")
   @@check(expression: "(subtotal >= (0)::numeric)", map: "chk_propuesta_detalle_subtotal")
+  @@unique([idPropuesta, idServicio], map: "uq_propuesta_detalle_propuesta_servicio")
   @@map("propuesta_detalle")
 }
 
