@@ -19,15 +19,14 @@ const serviciosRoutes = require("./modules/servicios/servicios.routes");
 const etapasRoutes = require("./modules/etapas/etapas.routes");
 //importamos las rutas de propuestas
 const propuestasRoutes = require("./modules/propuestas/propuestas.routes");
-
 //importamos las rutas de propuesta detalle
 const propuestaDetalleRoutes = require("./modules/propuesta-detalle/propuesta-detalle.routes");
-
 //importamos las rutas de proyectos
 const proyectosRoutes = require("./modules/proyectos/proyectos.routes");
-
 //importamos las rutas de proyecto-servicio
 const proyectoServicioRoutes = require("./modules/proyecto-servicio/proyecto-servicio.routes");
+//importamos las rutas de proyecto-etapa
+const proyectoEtapaRoutes = require("./modules/proyecto-etapa/proyecto-etapa.routes");
 
 //crearemos la app para el exprees
 const app = express();
@@ -47,6 +46,7 @@ app.use("/api/propuestas", propuestasRoutes);
 app.use("/api/propuestas-detalles", propuestaDetalleRoutes);
 app.use("/api/proyectos", proyectosRoutes);
 app.use("/api/proyecto-servicio", proyectoServicioRoutes);
+app.use("/api/proyecto-etapa", proyectoEtapaRoutes);
 //importamos las rutas
 app.get("/", (req, res) => {
   res.json({
