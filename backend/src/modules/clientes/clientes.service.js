@@ -42,7 +42,7 @@ async function crearClientes(datos) {
   ////el usuario debe debe de tener el rol de cliente
   if (usuario.idRol !== ROL_CLIENTE) {
     const error = new Error("El usuario no tiene el rol de cliente");
-    error.status = 400;
+    error.statusCode = 400;
     throw error;
   }
 
