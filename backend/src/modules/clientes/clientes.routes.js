@@ -8,6 +8,7 @@ const {
   validarObtenerclientes,
   validarObtenerClientesId,
   validarCrearCliente,
+  validarActualizarCliente,
 } = require("./clientes.validation");
 
 //creamos el router de express
@@ -33,7 +34,7 @@ router.post("/", validarCrearCliente, clientesController.crearCliente);
 //esta ruta sirve para actualizar un cliente
 router.put(
   "/:id",
-  validarObtenerClientesId,
+  validarActualizarCliente,
   clientesController.actualizarCliente,
 );
 //esta ruta sirve para eliminar un cliente

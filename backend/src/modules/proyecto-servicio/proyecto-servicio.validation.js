@@ -6,7 +6,7 @@ function validarProyecto(req, res, next) {
 //funcion para mostrar lso proyectso con servciicos por id
 function validarProyectoPorId(req, res, next) {
   //hacemos un request de cada id de proyecto y servicio para validar que existan en la base de datos
-  const idProyecto = Nunmber(req.params.idProyecto);
+  const idProyecto = Number(req.params.idProyecto);
   const idServicio = Number(req.params.idServicio);
 
   //verificamos que el poroyecto sea un numero y que sea mayor a 0
